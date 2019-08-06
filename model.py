@@ -27,46 +27,44 @@ def blight_model():
     #cleaning test_sets
     test_df.drop(useless_cols, axis=1, inplace=True)
 
-    
+    return train_df.select_dtypes('object').apply(pd.Series.nunique, axis=0)
     # for i in train_df.columns:
     #     print(i)
     #     print(train_df[i].head())
 
     #need to clean test as well
-    print(test_df['agency_name'])
-    pass
+    #print(test_df['non_us_str_code'])
+    #pass
 
 
-    #change categoricals to ints
-    #'agency_name', 'inspector_name', 'violator_name', disposition
-
-    #addresses ints
-    #'violation_street_number', 'violation_zip_code', 'mailing_address_str_number', 'zip_code'
-    #check 3rd row zip code
-
-    #address str
-    #city, state, country
-
-    #idk
-    #non_us_str_code, grafitti_status
-
-    #datetimes
-    #ticket_issued_date, hearing_date,
-
-    #categorical ints
-    #violation_code
-
-    #continuous ints
-    #fine_amount, admin_fee, state_fee, late_fee, discount_amount, clean_up_cost, judgement_amount,
-
-
-
-
-    # X_train, y_train, X_test = train_df.iloc[:,1:-1], train_df['compliance'], test_df[:,1:]
+    # X_train, y_train, X_test = train_df.iloc[:,1:-1], train_df['compliance'], test_df
     # model = DecisionTreeClassifier().fit(X_train, y_train)
     # prediction = model.predict(X_test)
-
     # return prediction
 
 
 print(blight_model())
+
+####NOTES
+
+#change categoricals to ints
+#'agency_name', 'inspector_name', 'violator_name', disposition
+
+#addresses ints
+#'violation_street_number', 'violation_zip_code', 'mailing_address_str_number', 'zip_code'
+#check 3rd row zip code
+
+#address str
+#city, state, country
+
+#idk
+#non_us_str_code, grafitti_status
+
+#datetimes
+#ticket_issued_date, hearing_date,
+
+#categorical ints
+#violation_code
+
+#continuous ints
+#fine_amount, admin_fee, state_fee, late_fee, discount_amount, clean_up_cost, judgement_amount
