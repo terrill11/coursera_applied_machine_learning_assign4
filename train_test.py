@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
 
 
 def train_model():
@@ -30,3 +30,29 @@ def train_model():
 
     #test data
     train_labels = train_df['compliance']
+    ticket_ids = train_df['ticket_id']
+    train_df.drop(columns=['compliance','ticket_id'], inplace=True)
+
+    X_train, X_test, y_train, y_test = train_test_split(train_df, train_labels, random_state=0)
+
+    from sklearn.svm import LinearSVC
+
+    l_svc = LinearSVC().fit(X_train, y_train)
+    l_svc_predict = l_svc.predict(X_test)
+    l_svc_score = roc_auc_score(y_test, l_svc_predict)
+    return l_svc_score
+
+    # from sklearn.linear_model import LogisticRegression
+
+    # # lr = LinearSVC().fit(X_train, y_train)
+    # # lr_predict = lr.predict(X_test)
+    # # lr_score = roc_auc_score(y_test, lr_predict)
+    # grid_lr = GridSearchVC(LogisticRegression(), param_grid=grid_values_lr, scoring='roc_auc')
+    # grid_lr.fit(X_train, y_train)
+
+    #return l_svc_score
+
+print(train_model())
+
+# LogisticRegression score: 0.547
+# LinearSVC score: 0.603
