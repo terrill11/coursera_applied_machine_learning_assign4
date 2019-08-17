@@ -19,8 +19,8 @@ def cleanup(train_df):
     # Dropping violation_code for now and get baseline results.
     # May add it back into columns if needed.
     train_df.drop(['ticket_issued_date', 'hearing_date', 'city',
-                   'zip_code', 'violation_code', 'state'], axis=1, inplace=True)
-
+                   'zip_code', 'violation_code'], axis=1, inplace=True)
+                    #'state'
     # Dropping remaining location columns.
     # Added benefit of removing columns with high number of null values to simplify further
     train_df.drop(['violation_zip_code', 'mailing_address_str_number'], axis=1, inplace=True)
@@ -33,10 +33,12 @@ def cleanup(train_df):
     #ticket_ids = train_df['ticket_id']
     train_df.drop(columns=['compliance', 'ticket_id'], inplace=True)
 
-    imp_feats = ['late_fee', 'disposition_Responsible by Admission', 'discount_amount', 'disposition_Responsible by Default',\
-                 'judgment_amount', 'fine_amount']
-
-    X_train, X_test, y_train, y_test = train_test_split(train_df.loc[:,imp_feats], train_labels, random_state=0)
+    # imp_feats = ['late_fee', 'disposition_Responsible by Admission', 'discount_amount', 'disposition_Responsible by Default',\
+    #              'judgment_amount', 'fine_amount']
+    train_df.drop(columns=['admin_fee','state_fee','clean_up_cost'], inplace=True)
+    train_df.dropna(inplace=True)
+    #X_train, X_test, y_train, y_test = train_test_split(train_df.loc[:,imp_feats], train_labels, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(train_df, train_labels, random_state=0)
 
 
     # from sklearn.ensemble import RandomForestClassifier
@@ -44,7 +46,7 @@ def cleanup(train_df):
     # features = dict(zip(X_train.columns, rfc.feature_importances_))
     # return X_train, X_test, y_train, y_test
 
-    return X_train, X_test, y_train, y_test
+    return X_train.columns#, X_test, y_train, y_test
 
 
 def train_model():
@@ -61,13 +63,13 @@ def train_model():
     l_svc_predict = l_svc.predict(X_test)
     l_svc_score = roc_auc_score(y_test, l_svc_predict)
 
-    from sklearn.linear_model import LogisticRegression
-    lr = LogisticRegression().fit(X_train, y_train)
-    lr_predict = lr.predict(X_test)
-    lr_score = roc_auc_score(y_test, lr_predict)
+    from sklearn.tree import DecisionTreeClassifier
+    dtc = DecisionTreeClassifier().fit(X_train, y_train)
+    dtc_predict = dtc.predict(X_test)
+    dtc_score = roc_auc_score(y_test, dtc_predict)
 
     from sklearn.ensemble import RandomForestClassifier
-    rfc = RandomForestClassifier(n_estimators=10, max_features=6, random_state=0).fit(X_train, y_train)
+    rfc = RandomForestClassifier(n_estimators=10, random_state=0).fit(X_train, y_train)
     rfc_predict = rfc.predict(X_test)
     rfc_score = roc_auc_score(y_test, rfc_predict)
 
@@ -78,14 +80,11 @@ def train_model():
 
 
     #return l_svc_score
-    return l_svc_score, lr_score, rfc_score, knn_score, sgd_score
+    return l_svc_score, dtc_score, rfc_score, knn_score
 
-#print(cleanup(df))
-print(train_model())
 
-# LogisticRegression score: 0.547
-# LinearSVC score: 0.603
-# RandomForestClassifier score: 0.621
+print(cleanup(df))
+#print(train_model())
 
 
 # importan features?
@@ -94,6 +93,7 @@ print(train_model())
 #     'agency_name_Detroit Police Department', 'agency_name_Department of Public Works', 'agency_name_Health Department',\
 #     'disposition_Responsible by Determination', 'agency_name_Neighborhood City Halls', 'admin_fee', 'state_fee',\
 #     'clean_up_cost', 'disposition_Responsible (Fine Waived) by Deter']
+# drop admin_fee, state_fee, clean_up_cost
 
 
 # things to do:
